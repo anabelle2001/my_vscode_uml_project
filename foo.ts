@@ -11,7 +11,7 @@ function point_to_tup(p: Point): [number, number] {
 
 interface RectData {
   title: string;
-  entries: [string, string][];
+  entries: { id: string; left: string; right: string }[];
 }
 
 interface Transform {
@@ -31,11 +31,16 @@ type HitPart =
   | "bottom-left"
   | "bottom-right";
 
-// Connections between rectangles, referencing by ID
+interface Endpoint {
+  rectId: string;
+  entryId?: string;
+}
+
+// Connections between rectangles or individual entries
 interface Connection {
   id: string;
-  from: string;
-  to: string;
+  from: Endpoint;
+  to: Endpoint;
 }
 
 // A draggable/resizable rectangle with text data
@@ -189,9 +194,12 @@ class Chart {
 
   // Connection management methods
 
-  addConnection(fromId: string, toId: string): string {
+  addConnection(
+    from: { rectId: string; entryId?: string },
+    to: { rectId: string; entryId?: string },
+  ): string {
     const id = crypto.randomUUID();
-    this.connections.set(id, { id, from: fromId, to: toId });
+    this.connections.set(id, { id, from, to });
     return id;
   }
 
@@ -205,7 +213,8 @@ class Chart {
 
   getConnectionsForRect(rectId: string): Connection[] {
     return this.getConnections().filter(
-      (c) => c.from === rectId || c.to === rectId,
+      (c) =>
+        c.from.rectId === rectId || c.to.rectId === rectId,
     );
   }
 
@@ -265,10 +274,10 @@ class Chart {
       const y = entryStartY + i * entryLineHeight;
       // left
       ctx.textAlign = "left";
-      ctx.fillText(e[0], r.x + pad, y);
+      ctx.fillText(e.left, r.x + pad, y);
       // right
       ctx.textAlign = "right";
-      ctx.fillText(e[1], r.x + r.width - pad, y);
+      ctx.fillText(e.right, r.x + r.width - pad, y);
     });
   }
 
@@ -530,13 +539,14 @@ function generateDummyData(count: number): RectData[] {
   const ds: RectData[] = [];
   for (let i = 0; i < count; i++) {
     const title = randomHex(6 + Math.floor(Math.random() * 11));
-    const entries: [string, string][] = [];
+    const entries: { id: string; left: string; right: string }[] = [];
     const n = 3 + Math.floor(Math.random() * 4);
     for (let j = 0; j < n; j++) {
-      entries.push([
-        randomHex(6 + Math.floor(Math.random() * 11)),
-        randomHex(6 + Math.floor(Math.random() * 11)),
-      ]);
+      entries.push({
+        id: crypto.randomUUID(),
+        left: randomHex(6 + Math.floor(Math.random() * 11)),
+        right: randomHex(6 + Math.floor(Math.random() * 11)),
+      });
     }
     ds.push({ title, entries });
   }
