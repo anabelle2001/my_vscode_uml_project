@@ -2,15 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Chrome against index.html",
-      "type": "chrome", // Use the standard chrome debugger
+      "name": "Run Extension",
+      "type": "extensionHost",
       "request": "launch",
-      "file": "${workspaceFolder}/index.html", // Point directly to the file to launch
-      "webRoot": "${workspaceFolder}", // Root directory of your web content
-      "sourceMaps": true,    // Ensure source maps are used
-      "preLaunchTask": "tsc: build - tsconfig.json" // Compile TS before launching
-      // Optional: Add "userDataDir": false or a path if you want a clean profile
-      // "userDataDir": false
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ]
     }
   ]
 }

@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2016",                     /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "module": "ESNext",                     /* Specify what module code is generated. */
-    "outDir": "./dist",                      /* Specify an output folder for all emitted files. */
-    "rootDir": ".",                          /* Specify the root folder within your source files. */
-    "sourceMap": true,                       /* Create source map files for emitted JavaScript files. */
-    "strict": true,                          /* Enable all strict type-checking options. */
-    "esModuleInterop": true,                 /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
-    "skipLibCheck": true,                    /* Skip type checking all .d.ts files. */
-    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */
+    "module": "commonjs",
+    "target": "es6",
+    "outDir": "out",
+    "rootDir": "src",
+    "sourceMap": true,
+    "strict": true
   },
-  "include": ["foo.ts"],                     /* Specifies an array of filenames or patterns to include in the program. */
-  "exclude": ["node_modules", "dist"]        /* Specifies an array of filenames or patterns that should be skipped when resolving 'include'. */
+  "exclude": [
+    "node_modules",
+    ".vscode-test"
+  ]
 }
