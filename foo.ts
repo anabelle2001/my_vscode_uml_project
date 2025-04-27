@@ -96,6 +96,20 @@ const RECT_STYLE = {
   fillStyle: "#fff",
   strokeStyle: "#000",
   textColor: "#000",
+  minWidth: 50, // Minimum practical width
+};
+
+// Map HitPart to CSS cursor styles
+const CURSOR_MAP: Record<HitPart, string> = {
+  inside: "move",
+  left: "ew-resize",
+  right: "ew-resize",
+  top: "ns-resize",
+  bottom: "ns-resize",
+  "top-left": "nwse-resize",
+  "top-right": "nesw-resize",
+  "bottom-left": "nesw-resize",
+  "bottom-right": "nwse-resize",
 };
 
 // The main chart managing multiple rectangles and interactions
@@ -121,6 +135,8 @@ class Chart {
     if (!ctx) throw new Error("Cannot get 2D context");
     this.ctx = ctx;
     this.initEvents();
+    // Initial cursor update
+    this.updateCursor({ x: -1, y: -1 } as Point); // Use dummy point outside canvas initially
   }
 
   // Install pointer and wheel events
@@ -226,6 +242,19 @@ class Chart {
     });
   }
 
+  // Calculate the minimum height needed for a rectangle's content
+  calculateMinimumHeight(r: Rectangle, scale: number): number {
+    const style = RECT_STYLE;
+    const titleFontSize = style.titleFontSize / scale;
+    const titleLineHeight = titleFontSize * 1.2; // Approximate line height
+    const entryLineHeight = style.lineHeight / scale;
+    const pad = style.padding / scale;
+
+    const contentHeight =
+      titleLineHeight + r.data.entries.length * entryLineHeight;
+    return contentHeight + pad * 2; // Add top and bottom padding
+  }
+
   hitTest(x: number, y: number): { rect: Rectangle; part: HitPart } | null {
     for (const rect of Array.from(this.rectangles.values()).reverse()) {
       const part = rect.getHitPart(x, y);
@@ -239,6 +268,24 @@ class Chart {
       x: (x - this.transform.translateX) / this.transform.scale,
       y: (y - this.transform.translateY) / this.transform.scale,
     };
+  }
+
+  // Update canvas cursor based on what's under the pointer
+  private updateCursor(screenPoint: Point): void {
+    // Don't change cursor during pinch or pan
+    if (this.pinch || this.panning) return;
+
+    // If resizing/dragging, cursor is already set, keep it
+    if (this.resizingRect || this.draggingRect) return;
+
+    const worldPoint = this.screenToWorld(screenPoint.x, screenPoint.y);
+    const hit = this.hitTest(worldPoint.x, worldPoint.y);
+
+    if (hit) {
+      this.canvas.style.cursor = CURSOR_MAP[hit.part];
+    } else {
+      this.canvas.style.cursor = "default"; // Or 'grab' if panning is possible
+    }
   }
 
   // ------ Event Handlers ------
@@ -272,33 +319,35 @@ class Chart {
           start: sp,
           initPos: { x: rect.x, y: rect.y },
         };
+        this.canvas.style.cursor = "move"; // Or 'grabbing'
       } else {
         this.resizingRect = {
           rect,
           part,
           start: sp,
-          init: {
-            x: rect.x,
-            y: rect.y,
-            w: rect.width,
-            h: rect.height,
-          },
+          // Set cursor based on the resize part
+          init: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
         };
+        this.canvas.style.cursor = CURSOR_MAP[part]; // Set resize cursor immediately
       }
     } else {
       // start pan
-      this.panning = {
-        start: sp,
-        initTrans: { ...this.transform },
-      };
+      this.panning = { start: sp, initTrans: { ...this.transform } };
+      this.canvas.style.cursor = "grabbing";
     }
   }
 
   private handlePointerMove(e: PointerEvent): void {
     const sp: Point = { x: e.clientX, y: e.clientY };
+    const currentPointerPos = { x: e.clientX, y: e.clientY };
     if (this.pointers.has(e.pointerId)) {
-      this.pointers.set(e.pointerId, sp);
+      this.pointers.set(e.pointerId, currentPointerPos);
+    } else {
+      // If pointer isn't tracked (e.g., mouse move without button down), update cursor
+      this.updateCursor(currentPointerPos);
+      return; // Don't process move if not interacting
     }
+
     // pinch?
     if (this.pinch && this.pointers.size === 2) {
       const pts = Array.from(this.pointers.values());
@@ -318,23 +367,53 @@ class Chart {
     // resize
     if (this.resizingRect) {
       const { rect, part, start, init } = this.resizingRect;
-      const dx = (sp.x - start.x) / this.transform.scale;
-      const dy = (sp.y - start.y) / this.transform.scale;
-      // adjust edges
+      const scale = this.transform.scale;
+      const dx = (sp.x - start.x) / scale;
+      const dy = (sp.y - start.y) / scale;
+      let newX = rect.x,
+        newY = rect.y,
+        newW = rect.width,
+        newH = rect.height;
+
+      // Calculate proposed dimensions
       if (part.includes("left")) {
-        rect.x = init.x + dx;
-        rect.width = init.w - dx;
+        newX = init.x + dx;
+        newW = init.w - dx;
       }
       if (part.includes("right")) {
-        rect.width = init.w + dx;
+        newW = init.w + dx;
       }
       if (part.includes("top")) {
-        rect.y = init.y + dy;
-        rect.height = init.h - dy;
+        newY = init.y + dy;
+        newH = init.h - dy;
       }
       if (part.includes("bottom")) {
-        rect.height = init.h + dy;
+        newH = init.h + dy;
       }
+
+      // Enforce minimum dimensions
+      const minHeight = this.calculateMinimumHeight(rect, scale);
+      const minWidth = RECT_STYLE.minWidth / scale; // Use scaled min width
+
+      if (newW < minWidth) {
+        if (part.includes("left")) {
+          newX = rect.x + rect.width - minWidth; // Adjust x to maintain right edge
+        }
+        newW = minWidth;
+      }
+      if (newH < minHeight) {
+        if (part.includes("top")) {
+          newY = rect.y + rect.height - minHeight; // Adjust y to maintain bottom edge
+        }
+        newH = minHeight;
+      }
+
+      // Apply constrained dimensions
+      rect.x = newX;
+      rect.y = newY;
+      rect.width = newW;
+      rect.height = newH;
+
       this.draw();
       return;
     }
@@ -369,6 +448,8 @@ class Chart {
       this.draggingRect = undefined;
       this.resizingRect = undefined;
       this.panning = undefined;
+      // Update cursor based on final position
+      this.updateCursor({ x: e.clientX, y: e.clientY });
     }
   }
 

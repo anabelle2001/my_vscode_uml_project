@@ -6,11 +6,10 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch"
-    // Removed start-chromium script
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^5.0.0" 
+    "typescript": "^5.0.0"
   }
 }
