@@ -1,0 +1,16 @@
+{
+  "name": "typescript-project",
+  "version": "1.0.0",
+  "description": "A basic TypeScript project setup for VS Code and Firefox debugging",
+  "main": "dist/foo.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start-firefox": "./start-firefox.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.0.0" 
+  }
+}
