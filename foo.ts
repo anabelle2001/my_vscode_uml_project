@@ -609,7 +609,25 @@ function main(): void {
   const canvas = initializeCanvas();
   const chart = new Chart(canvas);
   const data = generateDummyData(5);
-  data.forEach((d) => chart.addRectangle(d));
+  const ids = data.map((d) => chart.addRectangle(d));
+
+  // Dummy connection data between first and second rectangle entries
+  if (ids.length >= 2) {
+    const fromRect = chart.rectangles.get(ids[0]);
+    const toRect = chart.rectangles.get(ids[1]);
+    if (fromRect && toRect) {
+      const fromEntryId = fromRect.data.entries[0]?.id;
+      const toEntryId =
+        toRect.data.entries[toRect.data.entries.length - 1]?.id;
+      if (fromEntryId && toEntryId) {
+        chart.addConnection(
+          { rectId: ids[0], entryId: fromEntryId },
+          { rectId: ids[1], entryId: toEntryId },
+        );
+      }
+    }
+  }
+
   chart.draw();
 
   // expose methods globally if you like:
