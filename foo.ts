@@ -213,8 +213,7 @@ class Chart {
 
   getConnectionsForRect(rectId: string): Connection[] {
     return this.getConnections().filter(
-      (c) =>
-        c.sideA.rectId === rectId || c.sideB.rectId === rectId,
+      (c) => c.sideA.rectId === rectId || c.sideB.rectId === rectId,
     );
   }
 
@@ -329,9 +328,7 @@ class Chart {
           titleLineHeight +
           idx * entryLineHeight +
           entryLineHeight / 2;
-        const x = isFrom
-          ? r.x + r.width - pad
-          : r.x + pad;
+        const x = isFrom ? r.x + r.width - pad : r.x + pad;
         return { x, y };
       }
     }
@@ -624,8 +621,7 @@ function main(): void {
     const toRect = chart.rectangles.get(ids[1]);
     if (fromRect && toRect) {
       const fromEntryId = fromRect.data.entries[0]?.id;
-      const toEntryId =
-        toRect.data.entries[toRect.data.entries.length - 1]?.id;
+      const toEntryId = toRect.data.entries[toRect.data.entries.length - 1]?.id;
       if (fromEntryId && toEntryId) {
         chart.addConnection(
           { rectId: ids[0], entryId: fromEntryId },
