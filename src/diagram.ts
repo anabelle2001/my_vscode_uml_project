@@ -1,4 +1,13 @@
-// interactive_rectangles.ts
+interface RectEntry {
+  id: string;
+  left: string;
+  right: string;
+}
+interface RectData {
+  id: string;
+  title: string;
+  entries: RectEntry[];
+}
 
 interface Point {
   x: number;
@@ -7,13 +16,6 @@ interface Point {
 
 function point_to_tup(p: Point): [number, number] {
   return [p.x, p.y];
-}
-
-export interface RectEntry { id: string; left: string; right: string }
-export interface RectData {
-  id: string
-  title: string;
-  entries: RectEntry[];
 }
 
 interface Transform {
@@ -59,7 +61,7 @@ class Rectangle {
     x: number,
     y: number,
     width: number,
-    height: number,
+    height: number
   ) {
     this.data = data;
     this.x = x;
@@ -68,8 +70,8 @@ class Rectangle {
     this.height = height;
   }
 
-  get id(){
-    return this.data.id
+  get id() {
+    return this.data.id;
   }
 
   // Determine where a point lies relative to this rect
@@ -158,14 +160,14 @@ class Chart {
   // Install pointer and wheel events
   initEvents(): void {
     this.canvas.addEventListener("pointerdown", (e) =>
-      this.handlePointerDown(e),
+      this.handlePointerDown(e)
     );
     this.canvas.addEventListener("pointermove", (e) =>
-      this.handlePointerMove(e),
+      this.handlePointerMove(e)
     );
     this.canvas.addEventListener("pointerup", (e) => this.handlePointerUp(e));
     this.canvas.addEventListener("pointercancel", (e) =>
-      this.handlePointerUp(e),
+      this.handlePointerUp(e)
     );
     this.canvas.addEventListener("wheel", (e) => this.handleWheel(e), {
       passive: false,
@@ -178,7 +180,7 @@ class Chart {
     const h = 120;
     const x = Math.random() * (this.canvas.width / this.transform.scale - w);
     const y = Math.random() * (this.canvas.height / this.transform.scale - h);
-    const rect = new Rectangle({ ...data,  }, x, y, w, h);
+    const rect = new Rectangle({ ...data }, x, y, w, h);
     this.rectangles.set(rect.id, rect);
   }
 
@@ -197,7 +199,7 @@ class Chart {
 
   addConnection(
     sideA: { rectId: string; entryId?: string },
-    sideB: { rectId: string; entryId?: string },
+    sideB: { rectId: string; entryId?: string }
   ): string {
     const id = globalThis.crypto.randomUUID(); // Use browser/global crypto
     this.connections.set(id, { id, sideA, sideB });
@@ -214,7 +216,7 @@ class Chart {
 
   getConnectionsForRect(rectId: string): Connection[] {
     return this.getConnections().filter(
-      (c) => c.sideA.rectId === rectId || c.sideB.rectId === rectId,
+      (c) => c.sideA.rectId === rectId || c.sideB.rectId === rectId
     );
   }
 
@@ -230,7 +232,7 @@ class Chart {
       0,
       this.transform.scale,
       this.transform.translateX,
-      this.transform.translateY,
+      this.transform.translateY
     );
     this.drawConnections();
     for (const rect of this.rectangles.values()) {
@@ -604,7 +606,7 @@ function generateDummyData(count: number): RectData[] {
         right: randomHex(6 + Math.floor(Math.random() * 11)),
       });
     }
-    ds.push({ title, entries,id: globalThis.crypto.randomUUID() }); // Use browser/global crypto
+    ds.push({ title, entries, id: globalThis.crypto.randomUUID() }); // Use browser/global crypto
   }
   return ds;
 }
@@ -614,7 +616,7 @@ function main(): void {
   const canvas = initializeCanvas();
   const chart = new Chart(canvas);
   const data = generateDummyData(5);
-  data.forEach(x=>chart.addRectangle(x))
+  data.forEach((x) => chart.addRectangle(x));
   const ids = data.map((d) => d.id);
 
   // Dummy connection data between first and second rectangle entries
@@ -627,7 +629,7 @@ function main(): void {
       if (fromEntryId && toEntryId) {
         chart.addConnection(
           { rectId: ids[0], entryId: fromEntryId },
-          { rectId: ids[1], entryId: toEntryId },
+          { rectId: ids[1], entryId: toEntryId }
         );
       }
     }
