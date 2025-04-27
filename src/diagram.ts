@@ -1,5 +1,7 @@
 // interactive_rectangles.ts
 
+import { randomUUID } from "crypto";
+
 interface Point {
   x: number;
   y: number;
@@ -9,9 +11,11 @@ function point_to_tup(p: Point): [number, number] {
   return [p.x, p.y];
 }
 
+interface RectEntry { id: string; left: string; right: string }
 interface RectData {
+  id: string
   title: string;
-  entries: { id: string; left: string; right: string }[];
+  entries: RectEntry[];
 }
 
 interface Transform {
@@ -46,7 +50,6 @@ interface Connection {
 // A draggable/resizable rectangle with text data
 class Rectangle {
   static edgeThreshold = 6;
-  id: string;
   x: number;
   y: number;
   width: number;
@@ -54,19 +57,21 @@ class Rectangle {
   data: RectData;
 
   constructor(
-    id: string,
     data: RectData,
     x: number,
     y: number,
     width: number,
     height: number,
   ) {
-    this.id = id;
     this.data = data;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+  }
+
+  get id(){
+    return this.data.id
   }
 
   // Determine where a point lies relative to this rect
@@ -169,16 +174,14 @@ class Chart {
     });
   }
 
-  addRectangle(data: RectData): string {
-    const id = crypto.randomUUID();
+  addRectangle(data: RectData) {
     // place them randomly in world space
     const w = 200;
     const h = 120;
     const x = Math.random() * (this.canvas.width / this.transform.scale - w);
     const y = Math.random() * (this.canvas.height / this.transform.scale - h);
-    const rect = new Rectangle(id, data, x, y, w, h);
-    this.rectangles.set(id, rect);
-    return id;
+    const rect = new Rectangle({ ...data,  }, x, y, w, h);
+    this.rectangles.set(rect.id, rect);
   }
 
   removeRectangle(id: string): boolean {
@@ -603,7 +606,7 @@ function generateDummyData(count: number): RectData[] {
         right: randomHex(6 + Math.floor(Math.random() * 11)),
       });
     }
-    ds.push({ title, entries });
+    ds.push({ title, entries,id: randomUUID() });
   }
   return ds;
 }
@@ -613,7 +616,8 @@ function main(): void {
   const canvas = initializeCanvas();
   const chart = new Chart(canvas);
   const data = generateDummyData(5);
-  const ids = data.map((d) => chart.addRectangle(d));
+  data.forEach(x=>chart.addRectangle(x))
+  const ids = data.map((d) => d.id);
 
   // Dummy connection data between first and second rectangle entries
   if (ids.length >= 2) {

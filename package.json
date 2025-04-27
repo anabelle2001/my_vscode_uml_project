@@ -32,7 +32,7 @@
     "pokey.parse-tree"
   ],
   "devDependencies": {
-    "@types/node": "^12.11.7",
+    "@types/node": "^18",
     "@types/vscode": "^1.50.0",
     "@vscode/test-electron": "^2.0.0",
     "typescript": "^4.0.0",

@@ -26,15 +26,17 @@ function activate(context) {
                 vscode.window.showInformationMessage('No active editor');
                 return;
             }
-            const doc = editor.document;
-            const pos = editor.selection.active;
-            const location = new vscode.Location(doc.uri, pos);
             try {
-                const node = yield getNodeAtLocation(location);
+                // Get the node at the primary selection's active position
+                const position = editor.selection.active;
+                const location = new vscode.Location(editor.document.uri, position);
+                const node = getNodeAtLocation(location); // Call getNodeAtLocation here
                 vscode.window.showInformationMessage(`Node type: ${(_a = node === null || node === void 0 ? void 0 : node.type) !== null && _a !== void 0 ? _a : 'none'}`);
             }
             catch (e) {
-                vscode.window.showErrorMessage(`Error fetching node: ${e}`);
+                // Check if e is an Error object before accessing message
+                const errorMessage = e instanceof Error ? e.message : String(e);
+                vscode.window.showErrorMessage(`Error fetching node: ${errorMessage}`);
             }
         }));
         context.subscriptions.push(disposable);
