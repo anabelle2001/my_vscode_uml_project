@@ -5,6 +5,10 @@ interface Point {
   y: number;
 }
 
+function point_to_tup(p: Point): [number, number] {
+  return [p.x, p.y];
+}
+
 interface RectData {
   title: string;
   entries: [string, string][];
@@ -235,7 +239,8 @@ class Chart {
     }
 
     // single-pointer: pan or rect
-    const hit = this.hitTest(...Object.values(this.screenToWorld(sp.x, sp.y)));
+
+    const hit = this.hitTest(...point_to_tup(this.screenToWorld(sp.x, sp.y)));
     if (hit) {
       const { rect, part } = hit;
       if (part === "inside") {
