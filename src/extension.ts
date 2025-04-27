@@ -17,9 +17,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     const doc = editor.document;
     const pos = editor.selection.active;
-    const offset = doc.offsetAt(pos);
+    const location = new vscode.Location(doc.uri, pos);
     try {
-      const node = await getNodeAtLocation(doc.uri.fsPath, offset);
+      const node = await getNodeAtLocation(location);
       vscode.window.showInformationMessage(`Node type: ${node?.type ?? 'none'}`);
     } catch (e) {
       vscode.window.showErrorMessage(`Error fetching node: ${e}`);
