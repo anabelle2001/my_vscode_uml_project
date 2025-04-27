@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "start-firefox": "./start-firefox.sh"
+    "start-chromium": "./start-chromium.sh" // Renamed script
   },
   "author": "",
   "license": "ISC",

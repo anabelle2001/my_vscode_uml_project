@@ -2,20 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug TypeScript in Firefox",
-      "type": "firefox",
-      "request": "launch", // Use "launch" to open a new tab, "attach" might also work if the tab is open
-      "reAttach": true,    // Automatically re-attach if the debugger disconnects
-      "url": "file://${workspaceFolder}/index.html", // URL to open in Firefox
+      "name": "Debug TypeScript in Chromium",
+      "type": "chrome", // Change type to chrome
+      "request": "launch",
+      "url": "file://${workspaceFolder}/index.html", // URL to open
       "webRoot": "${workspaceFolder}", // Root directory of your web content
-      "port": 6000,        // Port specified in start-firefox.sh
-      "pathMappings": [    // Map compiled JS back to TS source
-        {
-          "url": "file://${workspaceFolder}/dist",
-          "path": "${workspaceFolder}/dist"
-        }
-      ],
+      "port": 9222,        // Default Chrome/Chromium debug port
+      "pathMapping": {     // Simplified path mapping for Chrome
+        "/": "${workspaceFolder}"
+      },
+      "sourceMaps": true,    // Ensure source maps are used
       "preLaunchTask": "tsc: build - tsconfig.json" // Compile TS before launching
+      // "userDataDir": false // Set to true or a path to use a separate profile
     }
   ]
 }
