@@ -31,6 +31,13 @@ type HitPart =
   | "bottom-left"
   | "bottom-right";
 
+// Connections between rectangles, referencing by ID
+interface Connection {
+  id: string;
+  from: string;
+  to: string;
+}
+
 // A draggable/resizable rectangle with text data
 class Rectangle {
   static edgeThreshold = 6;
@@ -119,6 +126,7 @@ class Chart {
   rectangles = new Map<string, Rectangle>();
   transform: Transform = { scale: 1, translateX: 0, translateY: 0 };
   pointers = new Map<number, Point>();
+  connections = new Map<string, Connection>();
   draggingRect?: { rect: Rectangle; start: Point; initPos: Point };
   resizingRect?: {
     rect: Rectangle;
@@ -177,6 +185,28 @@ class Chart {
     if (!rect) return false;
     rect.data = data;
     return true;
+  }
+
+  // Connection management methods
+
+  addConnection(fromId: string, toId: string): string {
+    const id = crypto.randomUUID();
+    this.connections.set(id, { id, from: fromId, to: toId });
+    return id;
+  }
+
+  removeConnection(id: string): boolean {
+    return this.connections.delete(id);
+  }
+
+  getConnections(): Connection[] {
+    return Array.from(this.connections.values());
+  }
+
+  getConnectionsForRect(rectId: string): Connection[] {
+    return this.getConnections().filter(
+      (c) => c.from === rectId || c.to === rectId,
+    );
   }
 
   // Clear & redraw everything
