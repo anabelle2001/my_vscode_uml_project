@@ -281,6 +281,56 @@ class Chart {
     });
   }
 
+  // Draw all connections as UE4-style bezier curves
+  private drawConnections(): void {
+    const ctx = this.ctx;
+    const scale = this.transform.scale;
+    ctx.save();
+    ctx.strokeStyle = "#0066ff";
+    ctx.lineWidth = 2 / scale;
+    for (const conn of this.getConnections()) {
+      const fromPos = this.getEndpointPosition(conn.from, true);
+      const toPos = this.getEndpointPosition(conn.to, false);
+      const cpX = fromPos.x + (toPos.x - fromPos.x) / 2;
+      const cp1Y = fromPos.y;
+      const cp2Y = toPos.y;
+      ctx.beginPath();
+      ctx.moveTo(fromPos.x, fromPos.y);
+      ctx.bezierCurveTo(cpX, cp1Y, cpX, cp2Y, toPos.x, toPos.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  private getEndpointPosition(ep: Endpoint, isFrom: boolean): Point {
+    const rect = this.rectangles.get(ep.rectId);
+    if (!rect) return { x: 0, y: 0 };
+    const r = rect;
+    const scale = this.transform.scale;
+    const style = RECT_STYLE;
+    const pad = style.padding / scale;
+    const titleFontSize = style.titleFontSize / scale;
+    const titleLineHeight = titleFontSize * 1.2;
+    const entryLineHeight = style.lineHeight / scale;
+    const titleY = r.y + pad;
+    if (ep.entryId) {
+      const idx = r.data.entries.findIndex((e) => e.id === ep.entryId);
+      if (idx >= 0) {
+        const y =
+          titleY +
+          titleLineHeight +
+          idx * entryLineHeight +
+          entryLineHeight / 2;
+        const x = isFrom
+          ? r.x + r.width - pad
+          : r.x + pad;
+        return { x, y };
+      }
+    }
+    // fallback to center
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  }
+
   // Calculate the minimum height needed for a rectangle's content
   calculateMinimumHeight(r: Rectangle, scale: number): number {
     const style = RECT_STYLE;
