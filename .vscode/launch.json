@@ -2,18 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug TypeScript in Chromium",
-      "type": "chrome", // Change type to chrome
+      "name": "Launch Chrome against index.html",
+      "type": "chrome", // Use the standard chrome debugger
       "request": "launch",
-      "url": "file://${workspaceFolder}/index.html", // URL to open
+      "file": "${workspaceFolder}/index.html", // Point directly to the file to launch
       "webRoot": "${workspaceFolder}", // Root directory of your web content
-      "port": 9222,        // Default Chrome/Chromium debug port
-      "pathMapping": {     // Simplified path mapping for Chrome
-        "/": "${workspaceFolder}"
-      },
       "sourceMaps": true,    // Ensure source maps are used
       "preLaunchTask": "tsc: build - tsconfig.json" // Compile TS before launching
-      // "userDataDir": false // Set to true or a path to use a separate profile
+      // Optional: Add "userDataDir": false or a path if you want a clean profile
+      // "userDataDir": false
     }
   ]
 }

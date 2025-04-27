@@ -5,8 +5,8 @@
   "main": "dist/foo.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch",
-    "start-chromium": "./start-chromium.sh" // Renamed script
+    "watch": "tsc --watch"
+    // Removed start-chromium script
   },
   "author": "",
   "license": "ISC",
