@@ -16,14 +16,17 @@ export async function activate(context: vscode.ExtensionContext) {
       return;
     }
 
-
-
     try {
-      const tree = parseTreeExt.exports.getTreeForUri(editor.document.uri);
+      // Get the node at the primary selection's active position
+      const position = editor.selection.active;
+      const location = new vscode.Location(editor.document.uri, position);
+      const node = getNodeAtLocation(location); // Call getNodeAtLocation here
 
       vscode.window.showInformationMessage(`Node type: ${node?.type ?? 'none'}`);
     } catch (e) {
-      vscode.window.showErrorMessage(`Error fetching node: ${e}`);
+       // Check if e is an Error object before accessing message
+       const errorMessage = e instanceof Error ? e.message : String(e);
+       vscode.window.showErrorMessage(`Error fetching node: ${errorMessage}`);
     }
   });
 
