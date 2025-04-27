@@ -11,18 +11,18 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:sampleParseTree.showNode"
+    "onCommand:python.showClassDiagram"
   ],
   "contributes": {
     "commands": [
       {
-        "command": "sampleParseTree.showNode",
-        "title": "Sample Parse Tree: Show Node",
-        "category": "Sample Parse Tree"
+        "command": "python.showClassDiagram",
+        "title": "Python: Show Class Diagram",
+        "category": "Python Diagram"
       }
     ]
   },
-  "main": "./out/extension.js",
+  "main": "./out/extension2.js",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
