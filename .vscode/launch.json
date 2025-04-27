@@ -12,6 +12,18 @@
       "outFiles": [
         "${workspaceFolder}/out/**/*.js"
       ]
+    },
+    {
+      "name": "Launch Diagram in Chrome",
+      "request": "launch",
+      "type": "chrome",
+      "file": "${workspaceFolder}/index.html",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/src/*" // Adjust if not using webpack, tsc maps might work directly
+      }
     }
   ]
 }

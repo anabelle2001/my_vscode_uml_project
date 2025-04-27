@@ -1,7 +1,5 @@
 // interactive_rectangles.ts
 
-import { randomUUID } from "crypto";
-
 interface Point {
   x: number;
   y: number;
@@ -201,7 +199,7 @@ class Chart {
     sideA: { rectId: string; entryId?: string },
     sideB: { rectId: string; entryId?: string },
   ): string {
-    const id = crypto.randomUUID();
+    const id = globalThis.crypto.randomUUID(); // Use browser/global crypto
     this.connections.set(id, { id, sideA, sideB });
     return id;
   }
@@ -601,12 +599,12 @@ function generateDummyData(count: number): RectData[] {
     const n = 3 + Math.floor(Math.random() * 4);
     for (let j = 0; j < n; j++) {
       entries.push({
-        id: crypto.randomUUID(),
+        id: globalThis.crypto.randomUUID(), // Use browser/global crypto
         left: randomHex(6 + Math.floor(Math.random() * 11)),
         right: randomHex(6 + Math.floor(Math.random() * 11)),
       });
     }
-    ds.push({ title, entries,id: randomUUID() });
+    ds.push({ title, entries,id: globalThis.crypto.randomUUID() }); // Use browser/global crypto
   }
   return ds;
 }
