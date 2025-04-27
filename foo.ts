@@ -232,6 +232,7 @@ class Chart {
       this.transform.translateX,
       this.transform.translateY,
     );
+    this.drawConnections();
     for (const rect of this.rectangles.values()) {
       this.drawRectangle(rect);
     }
