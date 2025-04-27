@@ -11,8 +11,8 @@ function point_to_tup(p: Point): [number, number] {
   return [p.x, p.y];
 }
 
-interface RectEntry { id: string; left: string; right: string }
-interface RectData {
+export interface RectEntry { id: string; left: string; right: string }
+export interface RectData {
   id: string
   title: string;
   entries: RectEntry[];
