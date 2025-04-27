@@ -1,5 +1,5 @@
 # Demo
-![wip-4-27](image.png)
+![wip-4-27](demo.gif)
 
 # Goal
 to get an interactive extension that shows the relationship between objects
