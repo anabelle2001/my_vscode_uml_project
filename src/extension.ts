@@ -15,11 +15,12 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage('No active editor');
       return;
     }
-    const doc = editor.document;
-    const pos = editor.selection.active;
-    const location = new vscode.Location(doc.uri, pos);
+
+
+
     try {
-      const node = await getNodeAtLocation(location);
+      const tree = parseTreeExt.exports.getTreeForUri(editor.document.uri);
+
       vscode.window.showInformationMessage(`Node type: ${node?.type ?? 'none'}`);
     } catch (e) {
       vscode.window.showErrorMessage(`Error fetching node: ${e}`);
