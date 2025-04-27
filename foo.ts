@@ -39,8 +39,8 @@ interface Endpoint {
 // Connections between rectangles or individual entries
 interface Connection {
   id: string;
-  from: Endpoint;
-  to: Endpoint;
+  sideA: Endpoint;
+  sideB: Endpoint;
 }
 
 // A draggable/resizable rectangle with text data
@@ -195,11 +195,11 @@ class Chart {
   // Connection management methods
 
   addConnection(
-    from: { rectId: string; entryId?: string },
-    to: { rectId: string; entryId?: string },
+    sideA: { rectId: string; entryId?: string },
+    sideB: { rectId: string; entryId?: string },
   ): string {
     const id = crypto.randomUUID();
-    this.connections.set(id, { id, from, to });
+    this.connections.set(id, { id, sideA, sideB });
     return id;
   }
 
@@ -214,7 +214,7 @@ class Chart {
   getConnectionsForRect(rectId: string): Connection[] {
     return this.getConnections().filter(
       (c) =>
-        c.from.rectId === rectId || c.to.rectId === rectId,
+        c.sideA.rectId === rectId || c.sideB.rectId === rectId,
     );
   }
 
@@ -290,8 +290,15 @@ class Chart {
     ctx.strokeStyle = "#0066ff";
     ctx.lineWidth = 2 / scale;
     for (const conn of this.getConnections()) {
-      const fromPos = this.getEndpointPosition(conn.from, true);
-      const toPos = this.getEndpointPosition(conn.to, false);
+      // choose endpoint pairing with minimal horizontal distance
+      const a1 = this.getEndpointPosition(conn.sideA, true);
+      const b1 = this.getEndpointPosition(conn.sideB, false);
+      const dx1 = Math.abs(a1.x - b1.x);
+      const a2 = this.getEndpointPosition(conn.sideA, false);
+      const b2 = this.getEndpointPosition(conn.sideB, true);
+      const dx2 = Math.abs(a2.x - b2.x);
+      const fromPos = dx1 <= dx2 ? a1 : a2;
+      const toPos = dx1 <= dx2 ? b1 : b2;
       const cpX = fromPos.x + (toPos.x - fromPos.x) / 2;
       const cp1Y = fromPos.y;
       const cp2Y = toPos.y;
