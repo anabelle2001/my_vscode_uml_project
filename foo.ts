@@ -64,8 +64,8 @@ class Rectangle {
     const rightDist = Math.abs(px - (this.x + this.width));
     const topDist = Math.abs(py - this.y);
     const bottomDist = Math.abs(py - (this.y + this.height));
-    const inX = px > this.x && px < this.x + this.width;
-    const inY = py > this.y && py < this.y + this.height;
+    const inX = px > this.x - t && px < this.x + this.width + t;
+    const inY = py > this.y - t && py < this.y + this.height + t;
 
     const nearLeft = leftDist < t && inY;
     const nearRight = rightDist < t && inY;
@@ -85,6 +85,18 @@ class Rectangle {
     return null;
   }
 }
+
+// Style constants for rectangles
+const RECT_STYLE = {
+  padding: 8,
+  lineHeight: 18,
+  titleFontSize: 16, // Customizable title font size
+  entryFontSize: 14,
+  fontFamily: "sans-serif",
+  fillStyle: "#fff",
+  strokeStyle: "#000",
+  textColor: "#000",
+};
 
 // The main chart managing multiple rectangles and interactions
 class Chart {
@@ -170,36 +182,47 @@ class Chart {
     }
   }
 
-  private drawRectangle(r: Rectangle): void {
+  public drawRectangle(r: Rectangle): void {
     const ctx = this.ctx;
-    const pad = 8;
-    const lineH = 18;
+    const scale = this.transform.scale;
+    const style = RECT_STYLE;
+
+    // Calculate scaled metrics
+    const pad = style.padding / scale;
+    const titleFontSize = style.titleFontSize / scale;
+    const entryFontSize = style.entryFontSize / scale;
+    const titleLineHeight = titleFontSize * 1.2; // Approximate line height based on font size
+    const entryLineHeight = style.lineHeight / scale; // Use fixed line height for entries for now
+
     // box
-    ctx.fillStyle = "#fff";
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1 / this.transform.scale;
+    ctx.fillStyle = style.fillStyle;
+    ctx.strokeStyle = style.strokeStyle;
+    ctx.lineWidth = 1 / scale;
     ctx.fillRect(r.x, r.y, r.width, r.height);
     ctx.strokeRect(r.x, r.y, r.width, r.height);
-    // text
-    ctx.fillStyle = "#000";
+
+    // text setup
+    ctx.fillStyle = style.textColor;
     ctx.textBaseline = "top";
-    ctx.font = `${14 / this.transform.scale}px sans-serif`;
+
     // title centered
-    const titleW = ctx.measureText(r.data.title).width;
-    const tx = r.x + (r.width - titleW) / 2;
-    ctx.fillText(r.data.title, tx, r.y + pad / this.transform.scale);
+    ctx.font = `${titleFontSize}px ${style.fontFamily}`;
+    ctx.textAlign = "center";
+    const titleX = r.x + r.width / 2;
+    const titleY = r.y + pad;
+    ctx.fillText(r.data.title, titleX, titleY);
+
     // entries
+    ctx.font = `${entryFontSize}px ${style.fontFamily}`;
+    const entryStartY = titleY + titleLineHeight; // Start entries below the title line
     r.data.entries.forEach((e, i) => {
-      const y =
-        r.y +
-        (pad + lineH) / this.transform.scale +
-        (i * lineH) / this.transform.scale;
+      const y = entryStartY + i * entryLineHeight;
       // left
       ctx.textAlign = "left";
-      ctx.fillText(e[0], r.x + pad / this.transform.scale, y);
+      ctx.fillText(e[0], r.x + pad, y);
       // right
       ctx.textAlign = "right";
-      ctx.fillText(e[1], r.x + r.width - pad / this.transform.scale, y);
+      ctx.fillText(e[1], r.x + r.width - pad, y);
     });
   }
 
