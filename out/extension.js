@@ -28,9 +28,9 @@ function activate(context) {
             }
             const doc = editor.document;
             const pos = editor.selection.active;
-            const offset = doc.offsetAt(pos);
+            const location = new vscode.Location(doc.uri, pos);
             try {
-                const node = yield getNodeAtLocation(doc.uri.fsPath, offset);
+                const node = yield getNodeAtLocation(location);
                 vscode.window.showInformationMessage(`Node type: ${(_a = node === null || node === void 0 ? void 0 : node.type) !== null && _a !== void 0 ? _a : 'none'}`);
             }
             catch (e) {

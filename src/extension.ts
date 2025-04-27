@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import type { ParseTreeExtensionApi } from 'pokey.parse-tree';
+import type { ParseTreeExtensionApi } from "pokey.parse-tree";
 
 export async function activate(context: vscode.ExtensionContext) {
   const parseTreeExt = vscode.extensions.getExtension<ParseTreeExtensionApi>('pokey.parse-tree');

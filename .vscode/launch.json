@@ -6,7 +6,6 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "disableExtensions": true,
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],

@@ -7,8 +7,12 @@
     "sourceMap": true,
     "strict": true
   },
-  "exclude": [
-    "node_modules",
-    ".vscode-test"
-  ]
+  "include": ["**/*"],
+  "typeRoots": [
+    // Add this section
+    "./node_modules/@types",
+    "./src/types",
+    "./types"
+  ],
+  "exclude": ["node_modules", ".vscode-test"]
 }
