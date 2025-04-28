@@ -559,9 +559,11 @@ function getWebviewHtml(
 
     </script>
      <!-- Load the diagram script -->
-    <script nonce="${nonce}" src="${scriptUri}" data-initial-data="${escapeHtml(
-    initialData
-  )}"></script>
+    <script
+      nonce="${nonce}"
+      src="${scriptUri}"
+      data-initial-data="${escapeHtml(initialData)}">
+    </script>
 </body>
 </html>`;
 }
